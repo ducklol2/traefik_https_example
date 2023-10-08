@@ -1,0 +1,24 @@
+# A minimal example compose.yaml that serves over self-signed HTTPS.
+
+services:
+
+  # A minimal Traefik HTTPS setup. For a better one, see:
+  # https://doc.traefik.io/traefik/user-guides/docker-compose/basic-example/
+  traefik_https_example:
+    image: traefik
+    container_name: traefik_https_example
+    command:
+      - --providers.docker=true
+      - --entrypoints.web.address=:443
+    ports: [443:443]
+    volumes: [/var/run/docker.sock:/var/run/docker.sock:ro]
+
+  # Visit https://localhost/.
+  # Or, if you're running https://github.com/ducklol2/subdomains,
+  # https://example.local/.
+  traefik_https_example_server:
+    image: traefik/whoami
+    container_name: traefik_https_example_server
+    labels:
+      - traefik.http.routers.example.tls=true
+      - traefik.http.routers.example.rule=Method(`GET`) || Host(`example.local`)
